@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String  @id @default(uuid())
+  telegramId    String  @unique
+  username      String  @unique
+  walletAddress String?
+  privateChatId String  @unique // for handling wallet authentication
+
+  dailyPersonalAllowance      Int @default(0)
+  dailyTippingAllowance       Int @default(0)
+  cumulativePersonalAllowance Int @default(0)
+
+  ownedChats          Chat[]               @relation(name: "owner")
+  chats               Chat[]
+  createGroupReqeusts CreateGroupRequest[]
+
+  tipsSent     Tip[] @relation("TipsFromUser")
+  tipsReceived Tip[] @relation("TipsToUser")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Chat model is used to represent a group chat
+model Chat {
+  id     String @id @default(uuid())
+  chatId String @unique
+
+  chatOwner   User   @relation(name: "owner", fields: [chatOwnerId], references: [id])
+  chatOwnerId String
+  chatUsers   User[]
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  CreateGroupRequest CreateGroupRequest[]
+
+  @@map("Chats")
+}
+
+model CreateGroupRequest {
+  id     String @id @default(uuid())
+  status String @default("pending")
+
+  chatId          String   @unique
+  chat            Chat     @relation(fields: [chatId], references: [id])
+  users           User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tip {
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  amount     Int
+  createdAt  DateTime @default(now())
+  settled    Boolean  @default(false)
+
+  fromUser User @relation("TipsFromUser", fields: [fromUserId], references: [id])
+  toUser   User @relation("TipsToUser", fields: [toUserId], references: [id])
+}

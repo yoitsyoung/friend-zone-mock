@@ -1,0 +1,13 @@
+{
+    "projects": [
+        {
+            "name": "friend-zone",
+            "path": "./contracts/friend_zone.tact",
+            "output": "./build",
+            "options": {
+                "external": true,
+                "debug": true
+            }
+        }
+    ]
+}

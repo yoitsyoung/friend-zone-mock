@@ -1,0 +1,30 @@
+version: "3"
+services:
+  redis:
+    image: redis/redis-stack-server:latest
+    ports:
+      - 6379:6379
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
+  # bot:
+  #   build:
+  #     context:
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - redis
+  #   environment:
+  #     - REDIS_URL=redis://redis:6379
+  #     - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+  #     - TELEGRAM_BOT_LINK="t.me/friendzone_ton_bot"
+  #     - MANIFEST_URL="https://raw.githubusercontent.com/ton-connect/demo-telegram-bot/master/tonconnect-manifest.json"
+  #     - WALLETS_LIST_CAHCE_TTL_MS=86400000
+  #     - DELETE_SEND_TX_MESSAGE_TIMEOUT_MS=600000
+  #     - CONNECTOR_TTL_MS=600000
